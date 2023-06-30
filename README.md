@@ -9,7 +9,7 @@ A discord bot using gpt 3.5 as a model. Now you can ask question in your server.
 * run ```npm install```
 
 
-* **Rename the file `.env.example` to `.env`**
+* Rename the file `.env.example` to `.env`
 
 
 * Change the content of the .env
