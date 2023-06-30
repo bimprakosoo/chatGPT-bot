@@ -21,10 +21,15 @@ const configuration = new Configuration({
   apiKey: process.env.API_KEY, //change you OPEN AI API KEY in .env file
 });
 const openai = new OpenAIApi(configuration);
+const conversationLogs = new Map(); //to collect multiple conversation from another user
+const threadIds = new Map(); //to collect multiple thread id from another user
 
 client.on('messageCreate', async (message) => {
   if (message.author.bot) return;
   if (message.content.startsWith('!')) return;
+
+  const userId = message.author.id;
+  const userLog = conversationLogs.get(userId) || [];
 
   let conversationLog = [{ role: 'system', content: "You are a friendly chat-bot." }];
 
@@ -50,7 +55,30 @@ client.on('messageCreate', async (message) => {
   });
 
   const botReply = result.data.choices[0].message.content;
-  message.reply(botReply);
+
+  if (!threadIds.has(userId)) { // make a new thread for the user if it doesn't exist
+    const thread = await message.startThread({
+      name: `Conversation with ${message.author.tag}`,
+      autoArchiveDuration: 60
+    });
+
+    threadIds.set(userId, thread.id);
+
+    await thread.send({ content: botReply });
+  } else { //reply to the existing thread
+    const threadId = threadIds.get(userId);
+    const threadChannel = await client.channels.fetch(threadId);
+
+    // Check if the message is in a thread channel
+    if (message.channel.isThread()) {
+      await threadChannel.send({ content: botReply });
+    } else {
+      // Find the thread message and reply to it
+      const threadMessage = await threadChannel.messages.fetch(threadId);
+      await threadMessage.reply(botReply);
+    }
+  }
+  conversationLogs.set(userId, [...userLog, ...conversationLog, {role: 'bot', content: botReply}]);
 });
 
 client.login(process.env.DISCORD_TOKEN); //change your discord token in .env
