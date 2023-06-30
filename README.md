@@ -2,7 +2,7 @@
 A discord bot using gpt 3.5 as a model. Now you can ask question in your server.
 ### Example
 
-![image]()
+![image](https://github.com/bimprakosoo/chatgpt-testbot/blob/main/public/chat.gif)
 
 # Setup
 
@@ -21,16 +21,16 @@ A discord bot using gpt 3.5 as a model. Now you can ask question in your server.
 2. Build a Discord bot under the application
 3. Get the token from bot setting
 
-   ![image]()
+   ![image](https://github.com/bimprakosoo/chatgpt-testbot/blob/main/public/img.png)
 4. Store the token to `.env` under the `DISCORD_TOKEN`
 
 5. Turn MESSAGE CONTENT INTENT `ON`
 
-   ![image]()
+   ![image](https://github.com/bimprakosoo/chatgpt-testbot/blob/main/public/img_2.png)
 
 6. Invite your bot to your server via OAuth2 URL Generator
 
-   ![image]()
+   ![image](https://github.com/bimprakosoo/chatgpt-testbot/blob/main/public/img_1.png)
 ---
 
 ## Step 2: Official API authentication
@@ -40,7 +40,7 @@ A discord bot using gpt 3.5 as a model. Now you can ask question in your server.
 
 2. Click Create new secret key
 
-   ![image]()
+   ![image](https://github.com/bimprakosoo/chatgpt-testbot/blob/main/public/img_3.png)
 
 3. Store the SECRET KEY to `.env` under the `API_KEY`
 
@@ -53,7 +53,7 @@ A discord bot using gpt 3.5 as a model. Now you can ask question in your server.
 
 2. Right click and choose `Copy CHANNEL ID`
 
-   ![image]()
+   ![image](https://github.com/bimprakosoo/chatgpt-testbot/blob/main/public/img_4.png)
 
 3. Store the CHANNEL ID to `.env` under the `CATEGORY_CHANNEL`
 
