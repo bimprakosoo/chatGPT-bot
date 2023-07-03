@@ -26,12 +26,22 @@ const threadIds = new Map(); //to collect multiple thread id from another user
 
 client.on('messageCreate', async (message) => {
   if (message.author.bot) return;
-  if (message.content.startsWith('!')) return;
 
   const userId = message.author.id;
   const userLog = conversationLogs.get(userId) || [];
+  const contentBot = "Friendly"
 
-  let conversationLog = [{ role: 'system', content: "You are a friendly chat-bot." }];
+  let conversationLog = [{ role: 'system', content: contentBot }];
+
+  const mentionBot = message.mentions.users.has(client.user.id);
+
+  if (mentionBot) {
+    message.content = message.content.replace(`<@${client.user.id}>`, '').trim();
+  } else {
+    if (!threadIds.has(userId)) {
+      return;
+    }
+  }
 
   await message.channel.sendTyping();
 
@@ -49,12 +59,15 @@ client.on('messageCreate', async (message) => {
     })
   })
 
+  const contentMatch = message.content.match(/\(([^)]\+)\)/);
+  const content = contentMatch ? contentMatch[1] : contentBot;
+
   const result = await openai.createChatCompletion({
     model: 'gpt-3.5-turbo',
     messages: conversationLog,
   });
 
-  const botReply = result.data.choices[0].message.content;
+  const botReply = result.data.choices[0].message.content.replace(contentBot, content);
 
   if (!threadIds.has(userId)) { // make a new thread for the user if it doesn't exist
     const thread = await message.startThread({

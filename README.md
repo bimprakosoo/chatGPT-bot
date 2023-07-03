@@ -4,6 +4,9 @@ A discord bot using gpt 3.5 as a model. Now you can ask question in your server.
 
 ![image](https://github.com/bimprakosoo/chatgpt-testbot/blob/main/public/chat.gif)
 
+* User need to mention the bot and user also can add "optional" personality to the bot by adding ('insert personality here') after mentioning the bot
+* I've tried 2 personalities and it works, such as friendly and sarcasm. Gonna update if there's another available.
+
 # Setup
 
 * run ```npm install```
