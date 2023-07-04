@@ -1,17 +1,20 @@
 const dotenv = require('dotenv');
-const { Client, IntentsBitField} = require('discord.js');
+const { Client, GatewayIntentBits, Collection} = require('discord.js');
 const { Configuration, OpenAIApi } = require('openai');
 const path = require("path");
+const helpCommand = require('../commands/help/help');
+const fs = require('fs');
 
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const client = new Client({
   intents: [
-    IntentsBitField.Flags.Guilds,
-    IntentsBitField.Flags.GuildMessages,
-    IntentsBitField.Flags.MessageContent,
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
   ]
 });
+client.commands = new Collection();
 
 client.on('ready', () => {
   console.log('Bot is ready !');
@@ -23,6 +26,7 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 const conversationLogs = new Map(); //to collect multiple conversation from another user
 const threadIds = new Map(); //to collect multiple thread id from another user
+const handlerCommands = require('../functions/handler_commands');
 
 client.on('messageCreate', async (message) => {
   if (message.author.bot) return;
@@ -30,9 +34,7 @@ client.on('messageCreate', async (message) => {
   const userId = message.author.id;
   const userLog = conversationLogs.get(userId) || [];
   const contentBot = "Friendly"
-
   let conversationLog = [{ role: 'system', content: contentBot }];
-
   const mentionBot = message.mentions.users.has(client.user.id);
 
   if (mentionBot) {
@@ -94,4 +96,24 @@ client.on('messageCreate', async (message) => {
   conversationLogs.set(userId, [...userLog, ...conversationLog, {role: 'bot', content: botReply}]);
 });
 
-client.login(process.env.DISCORD_TOKEN); //change your discord token in .env
+(async () => {
+  const commandFolders = fs.readdirSync(path.join(__dirname, '..', 'commands'));
+
+  handlerCommands(client, commandFolders, path.join(__dirname, '..', 'commands'));
+
+  client.on('interactionCreate', async (interaction) => {
+    if (!interaction.isCommand()) return;
+
+    const command = client.commands.get(interaction.commandName);
+    if (!command) return;
+
+    try {
+      await command.execute(interaction, client);
+    } catch (error) {
+      console.error(error);
+      await interaction.reply({ content: 'An error occurred while executing the command.', ephemeral: true });
+    }
+  });
+
+  client.login(process.env.DISCORD_TOKEN);
+})();
